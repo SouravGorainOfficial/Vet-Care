@@ -1,0 +1,6 @@
+{
+  "name": "VetCare",
+  "description": "Trusted Online Veterinary Care for Every Animal - Telemedicine, Appointments, Medical Records, Prescriptions, Health Tracking, and Online Medicine Store.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
