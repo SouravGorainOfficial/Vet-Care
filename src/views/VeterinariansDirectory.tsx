@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { VeterinarianProfile } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { DEFAULT_VETS } from '../data/defaultData';
 
 interface VeterinariansDirectoryProps {
   navigate: (path: string) => void;
@@ -50,10 +51,14 @@ export const VeterinariansDirectory: React.FC<VeterinariansDirectoryProps> = ({
       const res = await fetch('/api/vets');
       if (res.ok) {
         const data = await res.json();
-        setVets(data.veterinarians || []);
+        if (data.veterinarians && data.veterinarians.length > 0) {
+          setVets(data.veterinarians);
+          return;
+        }
       }
+      setVets(DEFAULT_VETS);
     } catch {
-      // ignore
+      setVets(DEFAULT_VETS);
     } finally {
       setLoading(false);
     }

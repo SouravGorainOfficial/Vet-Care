@@ -27,6 +27,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { VeterinarianProfile } from '../types';
+import { DEFAULT_VETS } from '../data/defaultData';
 
 interface PublicViewProps {
   navigate: (path: string) => void;
@@ -45,13 +46,20 @@ export const HomePage: React.FC<PublicViewProps> = ({ navigate, onBookVet }) => 
 
   useEffect(() => {
     fetch('/api/vets')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('API error');
+        return res.json();
+      })
       .then((data) => {
-        if (data.veterinarians) {
+        if (data.veterinarians && data.veterinarians.length > 0) {
           setFeaturedVets(data.veterinarians.slice(0, 3));
+        } else {
+          setFeaturedVets(DEFAULT_VETS.slice(0, 3));
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setFeaturedVets(DEFAULT_VETS.slice(0, 3));
+      });
   }, []);
 
   const handleHeroSearch = (e: React.FormEvent) => {

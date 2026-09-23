@@ -40,15 +40,58 @@ import { ConsultationRoom } from './views/ConsultationRoom';
 import { PharmacyStore } from './views/PharmacyStore';
 import { VeterinarianProfile } from './types';
 
+// Helper to normalize path when hosted on GitHub Pages subfolders (e.g. /<repo-name>/...)
+function getNormalizedPath(pathname: string): string {
+  if (!pathname || pathname === '/' || pathname === '/index.html') return '/';
+
+  const knownPrefixes = [
+    '/landing',
+    '/app',
+    '/veterinarians',
+    '/pharmacy',
+    '/dashboard',
+    '/vet',
+    '/admin',
+    '/consultation',
+    '/login',
+    '/register',
+    '/vet-registration',
+  ];
+
+  // If path directly matches known routes
+  if (knownPrefixes.some((p) => pathname === p || pathname.startsWith(p + '/') || pathname.startsWith(p + '?'))) {
+    return pathname;
+  }
+
+  // If hosted under /<repo-name>/... strip the first repository segment
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length >= 1) {
+    const afterRepo = '/' + segments.slice(1).join('/');
+    const cleanAfter = afterRepo === '' ? '/' : afterRepo;
+    if (cleanAfter === '/' || cleanAfter === '/index.html' || knownPrefixes.some((p) => cleanAfter === p || cleanAfter.startsWith(p + '/'))) {
+      return cleanAfter === '/index.html' ? '/' : cleanAfter;
+    }
+  }
+
+  return pathname;
+}
+
 function AppContent() {
-  const [currentPath, setCurrentPath] = useState<string>(window.location.pathname || '/');
+  const [currentPath, setCurrentPath] = useState<string>(() => {
+    const ghRedirect = sessionStorage.getItem('gh_pages_redirect');
+    if (ghRedirect) {
+      sessionStorage.removeItem('gh_pages_redirect');
+      return getNormalizedPath(ghRedirect.split('?')[0]);
+    }
+    return getNormalizedPath(window.location.pathname || '/');
+  });
   const [bookingVet, setBookingVet] = useState<VeterinarianProfile | null>(null);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState<boolean>(false);
   const [isSOSOpen, setIsSOSOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname);
+      setCurrentPath(getNormalizedPath(window.location.pathname));
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -56,7 +99,7 @@ function AppContent() {
 
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
-    setCurrentPath(path.split('?')[0]);
+    setCurrentPath(getNormalizedPath(path.split('?')[0]));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

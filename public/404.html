@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VetCare - Redirecting...</title>
+    <script>
+      // Single Page Application redirect for GitHub Pages
+      // Store current path and reload root so React router can handle it
+      (function() {
+        var path = window.location.pathname;
+        var search = window.location.search;
+        var hash = window.location.hash;
+        // Redirect to index with the path saved in sessionStorage if needed
+        sessionStorage.setItem('gh_pages_redirect', path + search + hash);
+        window.location.replace('./');
+      })();
+    </script>
+  </head>
+  <body style="font-family: system-ui, sans-serif; text-align: center; padding: 40px; color: #334155;">
+    <h2>Loading VetCare...</h2>
+    <p>Redirecting to the requested page...</p>
+    <p><a href="./" style="color: #0d9488; font-weight: bold;">Click here if not redirected automatically</a></p>
+  </body>
+</html>

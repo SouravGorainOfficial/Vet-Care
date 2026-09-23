@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useCart } from '../context/CartContext';
 import { VeterinarianProfile, Animal } from '../types';
+import { DEFAULT_VETS } from '../data/defaultData';
 
 interface MobileAppHomeProps {
   navigate: (path: string) => void;
@@ -48,13 +49,20 @@ export const MobileAppHome: React.FC<MobileAppHomeProps> = ({
   useEffect(() => {
     // Fetch active vets
     fetch('/api/vets')
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error('API error');
+        return res.json();
+      })
       .then((data) => {
-        if (data.veterinarians) {
+        if (data.veterinarians && data.veterinarians.length > 0) {
           setVets(data.veterinarians);
+        } else {
+          setVets(DEFAULT_VETS);
         }
       })
-      .catch(() => {})
+      .catch(() => {
+        setVets(DEFAULT_VETS);
+      })
       .finally(() => setLoadingVets(false));
 
     // Fetch user's pets if logged in
